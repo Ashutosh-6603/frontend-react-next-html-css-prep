@@ -38,8 +38,6 @@
 
         - useRef
 
-- Rules of Hooks
-
 - Controlled vs Uncontrolled components
 
 - React Router & client-side routing

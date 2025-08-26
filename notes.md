@@ -420,3 +420,339 @@ const memoizedCallback = useCallback(() => {
   doSomething(a, b);
 }, [a, b]);
 ```
+
+6. useRef 📌
+
+   Purpose →
+
+   - To reference DOM elements.
+
+   - To store mutable values without triggering re-renders.
+
+   - To cache previous values.
+
+# - Controlled vs Uncontrolled components
+
+1. Controlled Components ✅
+
+Definition
+
+    - A controlled component is a form input whose value is controlled by React state.
+
+    - The source of truth → React state.
+
+    - Every time you type, React updates the state.
+
+    - The input value comes from state → React is in full control.
+
+```
+import React, { useState } from "react";
+
+function ControlledForm() {
+  const [formData, setFormData] = useState({ name: "", email: "" });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Form submitted:", formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <h2>Controlled Form</h2>
+      <input
+        name="name"
+        value={formData.name}
+        onChange={handleChange}
+        placeholder="Enter your name"
+      />
+      <input
+        name="email"
+        value={formData.email}
+        onChange={handleChange}
+        placeholder="Enter your email"
+      />
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+
+export default ControlledForm;
+
+```
+
+How it works :-
+
+    1. User types in the input.
+
+    2. onChange updates the React state.
+
+    3. React re-renders the component.
+
+    4. The value of the input always matches the state.
+
+2. Uncontrolled Components ⚠️
+
+Definition
+
+    - An uncontrolled component is a form input whose value is controlled by the DOM, not React.
+
+    - The source of truth → DOM itself.
+
+    - You don’t store the value in React state.
+
+    - You access the value using useRef or document.querySelector().
+
+```
+import React, { useRef } from "react";
+
+function UncontrolledForm() {
+  const nameRef = useRef();
+  const emailRef = useRef();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log({
+      name: nameRef.current.value,
+      email: emailRef.current.value,
+    });
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <h2>Uncontrolled Form</h2>
+      <input ref={nameRef} placeholder="Enter name" />
+      <input ref={emailRef} placeholder="Enter email" />
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+
+export default UncontrolledForm;
+```
+
+| **Feature**           | **Controlled Component** ✅          | **Uncontrolled Component** ⚠️                          |
+| --------------------- | ------------------------------------ | ------------------------------------------------------ |
+| **Source of Truth**   | React State                          | DOM                                                    |
+| **Access Value**      | From state (`value`)                 | Using `ref` or DOM APIs                                |
+| **onChange Handling** | Required                             | Optional                                               |
+| **Validation**        | Easy                                 | Harder                                                 |
+| **Resetting Inputs**  | Easy (`setState("")`)                | Manual (`ref.current.value`)                           |
+| **Performance**       | Slightly slower for very large forms | Faster for very simple forms                           |
+| **Use Cases**         | Recommended for most apps            | Useful for simple, legacy, or third-party integrations |
+
+Q: What’s the difference between controlled and uncontrolled components in React?
+A:
+
+- Controlled components → React state is the single source of truth.
+
+- Uncontrolled components → The DOM manages the input value internally, and you fetch it using ref.
+
+- Controlled components are preferred because they make form handling, validation, and state management easier.
+
+# - React Router & client-side routing
+
+- React Router is the most popular library for handling routing in React single-page applications (SPA). It enables client-side routing, meaning page transitions happen without refreshing the browser.
+
+A. What is Client-Side Routing? 🧠
+
+- Normally, in server-side routing:
+
+  1. Each time you click a link → Browser sends a request to the server.
+
+  2. The server responds with a new HTML page → Full page reload.
+
+- In client-side routing (React Router):
+
+  1. The app loads once.
+
+  2. React Router intercepts link clicks.
+
+  3. It updates the URL but doesn’t reload the page.
+
+  4. The right component is rendered dynamically.
+
+=> React Router Best Practices
+
+✅ Use Link instead of <a> → prevents full reloads
+✅ Use useNavigate instead of window.location.href
+✅ Use Outlet for nested routing
+✅ Use Suspense & React.lazy() for code-splitting
+
+Q1. Difference between client-side and server-side routing?
+
+    - Client-side: Faster, SPA-based, React Router manages views.
+
+    - Server-side: Full page reloads, server serves new HTML every time.
+
+Q2. How does React Router work internally?
+
+    - Uses the History API (pushState, replaceState)
+
+    - Listens to URL changes → renders matching component.
+
+# - Context API vs Redux (when to use one over the other)
+
+| Feature             | **Context API** 🟢                         | **Redux** 🔴                                     |
+| ------------------- | ------------------------------------------ | ------------------------------------------------ |
+| **Library Type**    | Built-in React API                         | External library                                 |
+| **Best For**        | Small to medium apps                       | Large, complex apps                              |
+| **State Structure** | Simple                                     | Organized & centralized                          |
+| **Performance**     | Rerenders all consumers when value changes | Optimized with selective updates                 |
+| **Debugging**       | Limited                                    | Powerful dev tools                               |
+| **Boilerplate**     | Minimal                                    | More setup required                              |
+| **Async Support**   | Manual                                     | Built-in support with **Redux Thunk** / **Saga** |
+
+=> When to Use Which?
+
+✅ Use Context API → Small to medium apps, light global state, simple logic
+
+✅ Use Redux → Large-scale apps, multiple data sources, complex updates, debugging needs
+
+# - Prop drilling & solutions
+
+- Prop drilling happens when you pass data from a parent component to a deeply nested child component through multiple intermediate components, even if those components don’t need the data.
+
+- This leads to:
+
+  - Unnecessary code complexity
+
+  - More boilerplate
+
+  - Performance issues due to unwanted re-renders
+
+=> When to Use Which Solution
+
+| **Scenario**                 | **Best Solution**         | **Why**                             |
+| ---------------------------- | ------------------------- | ----------------------------------- |
+| Small app, few global states | **Context API**           | Simple & built-in                   |
+| Medium app, moderate state   | **Context + useReducer**  | Better control & cleaner updates    |
+| Large app, complex state     | **Redux Toolkit**         | Centralized store & debugging tools |
+| Heavy API usage              | **React Query / Zustand** | Better server-state management      |
+
+# - React.memo for optimization
+
+- React.memo is a higher-order component (HOC) in React that optimizes performance by preventing unnecessary re-renders of functional components.
+
+- By default, React re-renders a component whenever its parent re-renders, even if props haven't changed.
+
+- React.memo caches the rendered result (memoization) and reuses it if props are the same.
+
+Q1. What is React.memo and when would you use it?
+
+React.memo is a higher-order component that memoizes functional components and skips re-renders if props haven't changed.
+
+Use it for performance optimization when:
+
+    - Props rarely change
+
+    - Component is expensive to re-render
+
+Q2. Why doesn’t React.memo work with objects or functions?
+
+Because objects and functions are compared by reference, not value.
+Use useMemo or useCallback to stabilize references.
+
+=> Difference between React.memo and useMemo?
+
+| Feature | **React.memo**                   | **useMemo**                 |
+| ------- | -------------------------------- | --------------------------- |
+| Purpose | Prevents **component re-render** | Memoizes **computed value** |
+| Usage   | Wraps component                  | Wraps **values/objects**    |
+| Level   | Component-level                  | Value-level                 |
+
+# - Higher-Order Components (HOCs)
+
+- An HOC is a function that takes a component as input and returns a new component with enhanced features.
+
+- Key Points :-
+
+  - HOC adds extra functionality to components without modifying their code.
+
+  - HOCs reuse logic across multiple components.
+
+  - Mostly used in authentication, logging, data fetching, analytics, and permissions.
+
+- Example of HOCs
+
+```
+function withAuth(WrappedComponent) {
+  return function AuthHOC(props) {
+    const isAuthenticated = localStorage.getItem("token");
+
+    if (!isAuthenticated) {
+      return <h3>Access Denied. Please Login.</h3>;
+    }
+
+    return <WrappedComponent {...props} />;
+  };
+}
+
+const Dashboard = () => <h1>Dashboard</h1>;
+export default withAuth(Dashboard);
+```
+
+HOCs vs Custom Hooks ⚡
+
+- Custom Hooks have replaced HOCs in modern React.
+
+| Feature     | **HOCs**                             | **Custom Hooks**          |
+| ----------- | ------------------------------------ | ------------------------- |
+| Code Reuse  | ✅ Yes                               | ✅ Yes                    |
+| Readability | ❌ Nested HOCs can be confusing      | ✅ Much cleaner           |
+| Performance | Slightly slower due to extra renders | More efficient            |
+| Popularity  | Used in older codebases              | Preferred in modern React |
+
+# - Re-renders & performance optimization (memoization, lazy loading, code splitting)
+
+Q: What Causes Re-renders in React
+
+A: React components re-render when:
+
+    - State changes (useState)
+
+    - Props change (parent passes new props)
+
+    - Context value changes (useContext)
+
+    - Parent re-renders (child also re-renders, even if props didn't change)
+
+    - Force updates (forceUpdate, Redux, etc.)
+
+=> Lazy Loading in React
+
+- Lazy loading means loading components only when needed instead of loading everything at once.
+
+- This improves initial load performance.
+
+=> Best Practices for Performance Optimization
+
+| **Technique**               | **Use Case**                                             |
+| --------------------------- | -------------------------------------------------------- |
+| **React.memo**              | Prevent child re-renders when props don’t change         |
+| **useMemo**                 | Cache expensive computations                             |
+| **useCallback**             | Prevent function recreation & child re-renders           |
+| **Lazy loading**            | Load components only when needed                         |
+| **Code splitting**          | Reduce initial bundle size                               |
+| **Debouncing & Throttling** | Optimize API calls & heavy events                        |
+| **Virtualization**          | Use `react-window` or `react-virtualized` for long lists |
+| **React Profiler**          | Detect performance bottlenecks                           |
+
+# - Reconciliation & Diffing algorithm
+
+# - Error boundaries (what they are & how to implement)
+
+# - Auth & protected routes
+
+# - React Fiber & Concurrent Mode
+
+# - Server-Side Rendering (SSR) vs Client-Side Rendering (CSR)
+
+# - Testing tools (Jest, React Testing Library, etc.)
+
+# - Infinite scroll implementation in React
+
+# - Hydration in React (SSR/Next.js context, but concept applies to React too)
