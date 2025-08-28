@@ -741,18 +741,82 @@ A: React components re-render when:
 | **Virtualization**          | Use `react-window` or `react-virtualized` for long lists |
 | **React Profiler**          | Detect performance bottlenecks                           |
 
-# - Reconciliation & Diffing algorithm
-
 # - Error boundaries (what they are & how to implement)
 
-# - Auth & protected routes
+- An Error Boundary is a special React component that catches JavaScript errors in child components during rendering, in lifecycle methods, and in constructors, without crashing the entire app.
 
-# - React Fiber & Concurrent Mode
+- What Error Boundaries Catch & Don’t Catch ⚠️
 
-# - Server-Side Rendering (SSR) vs Client-Side Rendering (CSR)
+| **Caught** ✅                              | **Not Caught** ❌                             |
+| ------------------------------------------ | --------------------------------------------- |
+| Rendering errors in child components       | **Event handlers**                            |
+| Errors in lifecycle methods                | **Asynchronous code** (`setTimeout`, `fetch`) |
+| Errors in constructors of child components | Errors inside **error boundary itself**       |
 
-# - Testing tools (Jest, React Testing Library, etc.)
+# - React Fiber
 
-# - Infinite scroll implementation in React
+- React Fiber is the reconciliation engine introduced in React 16. It is basically a complete re-implementation of React's core reconciliation algorithm.
+
+- Key Concepts of React Fiber:
+
+  - Fiber Node:
+
+    - The fundamental unit of work in React Fiber. Each React element in the component tree corresponds to a Fiber node. These nodes are linked together to form a Fiber tree, which mirrors the structure of the component tree.
+
+  - Incremental Rendering:
+
+    - Fiber enables React to break down the rendering work into smaller, manageable chunks (fibers) and spread them out over multiple frames. This allows React to pause and resume work, preventing the UI from freezing during heavy updates.
+
+  - Prioritization:
+
+    - Fiber introduces a system for prioritizing updates. Urgent tasks, such as user interactions or animations, can be given higher priority than less critical tasks, like background data fetching, ensuring a smoother user experience.
+
+  - Concurrency:
+
+    - Fiber's architecture lays the groundwork for concurrent mode, a feature that allows React to handle multiple updates simultaneously without blocking the main thread. This is achieved through time-slicing, where React allocates small chunks of time to different tasks, ensuring responsiveness.
+
+  - Reconciliation:
+
+    - Fiber re-implements the reconciliation process, which is how React determines the differences between the old and new virtual DOM trees and updates the actual DOM. Fiber's approach allows for more efficient and flexible updates compared to the previous stack-based reconciler.
+
+# - Concurrent Mode
+
+- React Concurrent Mode, introduced in React 18, is a set of features and an underlying mechanism that enables React to prepare multiple versions of the UI simultaneously and prioritize updates, leading to a more responsive and fluid user experience.
+
+- Key Concepts:
+
+  - Time-Slicing and Interruptible Rendering:
+
+    - Unlike traditional synchronous rendering where React completes one update before starting another, Concurrent Mode allows React to pause and resume rendering work. This "time-slicing" enables React to interrupt a lower-priority rendering task to handle a higher-priority one (like user input or animations) and then return to the original task later.
+
+  - Prioritization:
+
+    - Concurrent Mode introduces the concept of prioritizing updates. React can distinguish between urgent updates (e.g., direct user interaction) and less urgent ones (e.g., background data fetching) and prioritize accordingly.
+
+  - Transitions:
+
+    - A specific feature enabled by Concurrent Mode, transitions allow you to mark certain updates as "non-urgent." This tells React that if a more urgent update comes in while the transition is rendering, it can be interrupted. This is particularly useful for smooth UI changes during data fetching or complex state updates, preventing jank.
+
+  - Suspense:
+
+    - While not exclusively tied to Concurrent Mode, Suspense for data fetching leverages the concurrent rendering capabilities to display fallback UI (like loading indicators) while data is being fetched, preventing the entire UI from blocking.
 
 # - Hydration in React (SSR/Next.js context, but concept applies to React too)
+
+1. What is Hydration in React? 🧵
+
+Hydration is the process where React takes a static HTML page (rendered on the server) and attaches event listeners + makes it interactive on the client.
+
+It happens after Server-Side Rendering (SSR) or Static Site Generation (SSG).
+
+- Basic Flow
+
+1. Server generates HTML → HTML is sent to the browser.
+
+2. Browser displays static HTML instantly → good for SEO & performance.
+
+3. React runs on the client → loads JavaScript, attaches event handlers, and activates components.
+
+4. Now the page is fully interactive.
+
+This process of “attaching interactivity” = hydration.
